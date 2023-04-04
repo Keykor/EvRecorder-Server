@@ -1,14 +1,21 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
-const port = 3000;
-const fs = require('fs');
 
+const dotenv = require('dotenv');
+dotenv.config({ path: './config.env' });
+const PORT = process.env.PORT || 3000;
+
+const mongoose = require('mongoose');
+const Capturas = require('./models/Capturas');
+const mongoURI = process.env.MONGODB_URL;
+mongoose.connect(mongoURI).then(() => console.log('db connected'));
+
+const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.listen(port, () => {
-    console.log(`App listening on port ${port}`);
+app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}`);
 });
 
 const alphabet = "qwertyuiopasdfghjklñzxcvbnmQWERTYUIOPASDFGHJKLÑZXCVBNM";
@@ -48,15 +55,24 @@ app.get('/start', (req, res) => {
     res.send(settings)
 })
   
+const importData = async (data) => {
+  try {
+    await Capturas.create(data);
+    console.log('EXITO al importar captura.');
+    process.exit();
+  } catch (error) {
+    console.log('ERROR al importar captura.', error);
+  }
+}
+
 app.post('/save', (req, res) => {
-    console.log('Body', req.body)
     let info = req.body ? JSON.parse(req.body?.setup).postdata : {}
 
-    console.log('Info', info.info)
-    info.info.length ? console.log('Split', JSON.parse(info.info[0])) : console.log('vacio')
+    console.log('Info', info)
+    //info.info.length ? console.log('Split', JSON.parse(info.info[0])) : console.log('vacio')
     res.send(JSON.stringify({"userToken": "asdasdasd"}));
 
-    fs.writeFileSync('test.json', JSON.stringify(info))
+    importData(info);
 });
 
 
