@@ -9,7 +9,16 @@ const CapturasSchema = new Schema({
     winh: Number,
     docw: Number,
     doch: Number,
-    info: [String],
+    info: [{
+        id: Number,
+        timeNow: Date,
+        cursorPosX: Number,
+        cursorPosY: Number,
+        eventName: String,
+        elemXpath: String,
+        elemAttrs: String,
+        extraInfo: Object,
+    }],
     task: String,
     action: String,
 });

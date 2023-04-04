@@ -59,20 +59,17 @@ const importData = async (data) => {
   try {
     await Capturas.create(data);
     console.log('EXITO al importar captura.');
-    process.exit();
   } catch (error) {
     console.log('ERROR al importar captura.', error);
   }
 }
 
 app.post('/save', (req, res) => {
-    let info = req.body ? JSON.parse(req.body?.setup).postdata : {}
+    res.send(JSON.stringify({"userToken": "si"}));
 
-    console.log('Info', info)
-    //info.info.length ? console.log('Split', JSON.parse(info.info[0])) : console.log('vacio')
-    res.send(JSON.stringify({"userToken": "asdasdasd"}));
-
-    importData(info);
+    let data = req.body ? JSON.parse(req.body?.setup).postdata : {};
+    data.info = data.info.map((value) => JSON.parse(value));
+    importData(data);
 });
 
 
