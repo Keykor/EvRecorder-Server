@@ -12,17 +12,21 @@ mongoose.connect(mongoURI).then(() => console.log('db connected'));
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({limit: '25mb'}));
 
 app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
 });
 
-const alphabet = "qwertyuiopasdfghjklñzxcvbnmQWERTYUIOPASDFGHJKLÑZXCVBNM";
+const alphabet = "qwertyuiopasdfghjklñzxcvbnm";
+const alphabetCaps = "QWERTYUIOPASDFGHJKLÑZXCVBNM";
 const numbers = "0123456789";
 function itsLetterOrNumber(text) {
   if (alphabet.includes(text)) {
     return 'a';
+  }
+  if (alphabetCaps.includes(text)) {
+    return 'A';
   }
   if (numbers.includes(text)) {
     return '1';
@@ -43,7 +47,7 @@ app.get('/start', (req, res) => {
         pollingEvents: "mousemove scroll",
         pollingMs: 150,
         postServer: "http://localhost:3000/save",
-        postInterval: 5,
+        postInterval: 60,
         saveAttributes: false,
         callback: (e) => {
             if (e.key) {
@@ -68,7 +72,13 @@ app.post('/save', (req, res) => {
     res.send(JSON.stringify({"userToken": "si"}));
 
     let data = req.body ? JSON.parse(req.body?.setup).postdata : {};
-    data.info = data.info.map((value) => JSON.parse(value));
+    console.log(data.info)
+    data.info = data.info.map((value) => {
+      let newValue = JSON.parse(value);
+      newValue.extraInfo = JSON.parse(newValue.extraInfo);
+      return newValue;
+    });
+    console.log(data.info)
     importData(data);
 });
 
