@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3000;
 const mongoose = require('mongoose');
 const Capturas = require('./models/Capturas');
 const mongoURI = process.env.MONGODB_URL;
+const postServerURL = process.env.POSTSERVER_URL
 mongoose.connect(mongoURI).then(() => console.log('db connected'));
 
 const app = express();
@@ -46,7 +47,7 @@ app.get('/start', (req, res) => {
         regularEvents: "click keydown",
         pollingEvents: "mousemove scroll",
         pollingMs: 150,
-        postServer: "http://localhost:3000/save",
+        postServer: postServerURL,
         postInterval: 60,
         saveAttributes: false,
         callback: (e) => {
