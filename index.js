@@ -72,7 +72,7 @@ const importData = async (data) => {
 app.post('/save', (req, res) => {
     res.send(JSON.stringify({"userToken": "si"}));
 
-    let data = req.body ? JSON.parse(req.body?.setup).postdata : {};
+    let data = req.body ? JSON.parse(req.body.setup).postdata : {};
     console.log(data.info)
     data.info = data.info.map((value) => {
       let newValue = JSON.parse(value);
