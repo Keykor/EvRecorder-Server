@@ -81,4 +81,8 @@ app.post('/save', (req, res) => {
     importData(data);
 });
 
+app.get('/', function(req,res) {
+  res.send('i live');
+});
+
 
