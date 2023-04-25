@@ -88,7 +88,9 @@ app.get('/', function(req,res) {
 const DATA_PASS = process.env.DATA_PASS
 app.get("/fetchall",(req,res) => {
   if (req.body.pass === DATA_PASS) {
-    res.json(Capturas.find({}));
+    Capturas.find({}).exec(function(err, data) {
+      res.send(data);
+    })
   }
   else {
     res.status(401).send({
