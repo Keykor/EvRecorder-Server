@@ -85,4 +85,14 @@ app.get('/', function(req,res) {
   res.send('i live');
 });
 
-
+const DATA_PASS = process.env.DATA_PASS
+app.get("/fetchall",(req,res) => {
+  if (req.body.pass === DATA_PASS) {
+    res.json(Capturas.find({}));
+  }
+  else {
+    res.status(401).send({
+      message:'No tienes acceso'
+    });
+  }
+})
