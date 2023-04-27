@@ -18,23 +18,6 @@ app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
 });
 
-const alphabet = "qwertyuiopasdfghjklñzxcvbnm";
-const alphabetCaps = "QWERTYUIOPASDFGHJKLÑZXCVBNM";
-const numbers = "0123456789";
-function itsLetterOrNumber(text) {
-  if (alphabet.includes(text)) {
-    return 'a';
-  }
-  if (alphabetCaps.includes(text)) {
-    return 'A';
-  }
-  if (numbers.includes(text)) {
-    return '1';
-  }
-  return text;
-}
-
-
 app.get('/start', (req, res) => {
     console.log('Me pidieron settings');
     let settings = {
