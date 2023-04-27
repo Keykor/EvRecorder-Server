@@ -3,6 +3,7 @@ const cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
 
+require('dotenv').config()
 const mongoose = require('mongoose');
 const Capturas = require('./models/Capturas');
 const mongoURI = process.env.MONGODB_URL;
@@ -40,7 +41,7 @@ app.get('/start', (req, res) => {
         sendDataMode: 'JSON',
         completionMode : {type:'postQuantity', params: 1},
         userToken:'asdasdasd',
-        windowCaptured: { timelapse: 5, max:60 },
+        windowCaptured: { timelapse: 0, max:60 },
         debug: true,
         regularEvents: "click keydown",
         pollingEvents: "mousemove scroll",
@@ -48,11 +49,7 @@ app.get('/start', (req, res) => {
         postServer: postServerURL,
         postInterval: 60,
         saveAttributes: false,
-        callback: (e) => {
-            if (e.key) {
-                return itsLetterOrNumber(e.key)
-            }
-        },
+        anonymizationTechnique: "replaceCharForConstant",
     }
 
     res.send(settings)
@@ -68,17 +65,21 @@ const importData = async (data) => {
 }
 
 app.post('/save', (req, res) => {
-    res.send(JSON.stringify({"userToken": "si"}));
-
-    let data = req.body ? JSON.parse(req.body.setup).postdata : {};
-    console.log(data.info)
-    data.info = data.info.map((value) => {
-      let newValue = JSON.parse(value);
-      newValue.extraInfo = JSON.parse(newValue.extraInfo);
-      return newValue;
-    });
-    console.log(data.info)
-    importData(data);
+    try {
+      let data = req.body ? JSON.parse(req.body.setup).postdata : {};
+      data.info = data.info.map((value) => {
+        return JSON.parse(value);
+      });
+      importData(data);
+      res.status(201).send({
+        message:'La captura se ha procesado correctamente'
+      });
+    } 
+    catch (error) {
+      res.status(422).send({
+        message:'Formato de captura incorrecta'
+      });
+    }
 });
 
 app.get('/', function(req,res) {

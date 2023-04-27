@@ -17,7 +17,9 @@ const CapturasSchema = new Schema({
         eventName: String,
         elemXpath: String,
         elemAttrs: String,
-        extraInfo: Object,
+        extraInfo: {
+            value: String,
+        },
     }],
     task: String,
     action: String,
