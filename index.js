@@ -3,12 +3,12 @@ const cors = require('cors');
 
 const PORT = process.env.PORT || 3000;
 
-require('dotenv').config()
 const mongoose = require('mongoose');
 const Capturas = require('./models/Capturas');
 const mongoURI = process.env.MONGODB_URL;
 const postServerURL = process.env.POSTSERVER_URL
 mongoose.connect(mongoURI).then(() => console.log('db connected'));
+
 
 const app = express();
 app.use(cors());
@@ -48,19 +48,30 @@ const importData = async (data) => {
 }
 
 app.post('/save', (req, res) => {
+    let data;
     try {
-      let data = req.body ? JSON.parse(req.body.setup).postdata : {};
-      data.info = data.info.map((value) => {
-        return JSON.parse(value);
-      });
-      importData(data);
-      res.status(201).send({
-        message:'La captura se ha procesado correctamente'
-      });
+      data = req.body ? JSON.parse(req.body.setup).postdata : {};
     } 
     catch (error) {
       res.status(422).send({
         message:'Formato de captura incorrecta'
+      });
+      return
+    }
+    try {
+      data.info = data.info.map((actualData) => {
+        let parsed = JSON.parse(actualData);
+        parsed["extraInfo"] = JSON.parse(parsed["extraInfo"]);
+        return parsed;
+      });
+      importData(data);
+      res.status(201).send({
+      	message:'La captura se ha procesado correctamente'
+      });
+    }
+    catch (error) {
+      res.status(422).send({
+        message:'Formato de eventos incorrecto'
       });
     }
 });
