@@ -5,12 +5,11 @@ const PORT = process.env.PORT || 3000;
 
 const mongoose = require('mongoose');
 const Capturas = require('./models/Capturas');
-const mongoURI = process.env.MONGODB_URL || "mongodb://localhost:27017";
+const mongoURI = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017";
 const postServerURL = process.env.POSTSERVER_URL || "http://localhost:3000/save"
 mongoose.connect(mongoURI).then(() => console.log('db connected'));
 
 const postInterval = process.env.POSTINTERVAL || 60;
-const userToken = process.env.USERTOKEN || 'investigador';
 
 const app = express();
 app.use(cors());
@@ -25,7 +24,6 @@ app.get('/start', (req, res) => {
     let settings = {
         sendDataMode: 'JSON',
         completionMode : {type:'postQuantity', params: 1},
-        userToken:userToken,
         windowCaptured: { timelapse: 0, max:60 },
         debug: true,
         regularEvents: "click keydown",
@@ -34,7 +32,6 @@ app.get('/start', (req, res) => {
         postServer: postServerURL,
         postInterval: postInterval,
         saveAttributes: false,
-        anonymizationTechnique: "replaceCharForConstant",
     }
 
     res.send(settings)

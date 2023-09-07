@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema
 
 const CapturasSchema = new Schema({
+    userToken: String,
+    date: Date,
     url: String,
     screenw: Number,
     screenh: Number,
@@ -17,9 +19,7 @@ const CapturasSchema = new Schema({
         eventName: String,
         elemXpath: String,
         elemAttrs: String,
-        extraInfo: {
-            value: String,
-        },
+        extraInfo: Object,
     }],
     task: String,
     action: String,
