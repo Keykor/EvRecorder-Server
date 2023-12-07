@@ -94,7 +94,7 @@ app.get("/fetchall",(req,res) => {
 })
 
 const ITEMS_PER_PAGE = 10;
-app.get("/fetchall", async (req, res) => {
+app.get("/fetchpage", async (req, res) => {
   const providedPassword = req.query.pass;
 
   if (providedPassword !== DATA_PASS) {
