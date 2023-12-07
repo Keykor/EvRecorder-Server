@@ -92,3 +92,23 @@ app.get("/fetchall",(req,res) => {
     });
   }
 })
+
+const ITEMS_PER_PAGE = 10;
+app.get("/fetchall", async (req, res) => {
+  const providedPassword = req.query.pass;
+
+  if (providedPassword !== DATA_PASS) {
+    return res.status(401).send({ message: 'No tienes acceso' });
+  }
+
+  const page = parseInt(req.query.page) || 1;
+
+  try {
+    const skip = (page - 1) * ITEMS_PER_PAGE;
+    const data = await Capturas.find({}).skip(skip).limit(ITEMS_PER_PAGE).exec();
+    res.json(data);
+  } catch (error) {
+    console.error('Error al consultar la base de datos:', error);
+    res.status(500).send({ message: 'Error interno del servidor' });
+  }
+});
