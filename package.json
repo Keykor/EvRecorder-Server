@@ -1,11 +1,13 @@
 {
-  "name": "experimento",
+  "name": "evrecord-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple Express.js server for the EvRecord browser extension that captures and stores user interaction events",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "node index.js"
   },
+  "keywords": ["evrecord", "interaction", "events", "browser-extension", "research"],
   "author": "",
   "license": "ISC",
   "dependencies": {
