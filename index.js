@@ -1,14 +1,15 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
-
-const PORT = process.env.PORT || 3000;
-
+const fs = require('fs');
 const mongoose = require('mongoose');
 const Record = require('./models/Record');
-const mongoURI = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017/evrecord";
-const postServerURL = process.env.POSTSERVER_URL || "http://localhost:3000/save"
+
+// Environment variables for configuration
+const PORT = process.env.PORT || 3000;
+const MONGODB_URL = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017/evrecord";
+const DATA_PASS = process.env.DATA_PASS || 'password';
+const ITEMS_PER_PAGE = process.env.ITEMS_PER_PAGE || 10;
 
 // Simple structured logging
 const log = {
@@ -17,11 +18,9 @@ const log = {
   warn: (message, data = {}) => console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, data)
 };
 
-mongoose.connect(mongoURI)
+mongoose.connect(MONGODB_URL)
   .then(() => log.info('Database connected successfully'))
   .catch(err => log.error('Database connection failed', err));
-
-const postInterval = process.env.POSTINTERVAL || 60;
 
 const app = express();
 app.use(cors());
@@ -31,6 +30,17 @@ app.listen(PORT, () => {
     log.info(`EvRecord server started on port ${PORT}`);
 });
 
+// Health check endpoint - Returns server status and basic info
+app.get('/', function(req,res) {
+  res.json({ 
+    status: 'alive', 
+    service: 'EvRecord Server',
+    version: '1.0.0' 
+  });
+});
+
+// Configuration endpoint - Returns event recording configuration for the EvRecorder extension
+// Used by the browser extension to know what events to capture and how
 app.get('/start', (req, res) => {
     log.info('Configuration requested');
     try {
@@ -50,7 +60,8 @@ app.get('/start', (req, res) => {
         });
     }
 })
-  
+
+// Helper function to save interaction data to MongoDB  
 const importData = async (data) => {
   try {
     await Record.create(data);
@@ -60,6 +71,9 @@ const importData = async (data) => {
   }
 }
 
+// Data storage endpoint - Receives and stores interaction events from the EvRecorder extension
+// Expects: userId (string), events (array with type field required for each event)
+// Returns: Success/error status
 app.post('/save', (req, res) => {
     let data;
     try {
@@ -100,15 +114,9 @@ app.post('/save', (req, res) => {
     }
 });
 
-app.get('/', function(req,res) {
-  res.json({ 
-    status: 'alive', 
-    service: 'EvRecord Server',
-    version: '1.0.0' 
-  });
-});
-
-const DATA_PASS = process.env.DATA_PASS
+// Data retrieval endpoint - Returns ALL stored interaction records
+// Requires: password in request body for authentication
+// Returns: All records with count information
 app.get("/fetchall",(req,res) => {
   if (req.body.pass === DATA_PASS) {
     Record.find({}).exec(function(err, data) {
@@ -137,7 +145,9 @@ app.get("/fetchall",(req,res) => {
   }
 })
 
-const ITEMS_PER_PAGE = 10;
+// Paginated data retrieval endpoint - Returns records in pages for better performance
+// Query params: pass (password), page (page number, default: 1), limit (items per page, default: 10)
+// Returns: Paginated records with pagination metadata (total items, pages, etc.)
 app.get("/fetchpage", async (req, res) => {
   const providedPassword = req.query.pass;
 
@@ -150,22 +160,23 @@ app.get("/fetchpage", async (req, res) => {
   }
 
   const page = parseInt(req.query.page) || 1;
+  const itemsPerPage = parseInt(req.query.limit) || ITEMS_PER_PAGE;
 
   try {
-    const skip = (page - 1) * ITEMS_PER_PAGE;
-    const data = await Record.find({}).skip(skip).limit(ITEMS_PER_PAGE).exec();
+    const skip = (page - 1) * itemsPerPage;
+    const data = await Record.find({}).skip(skip).limit(itemsPerPage).exec();
     const total = await Record.countDocuments();
     
-    log.info('Page fetched', { page, itemsReturned: data.length, total });
+    log.info('Page fetched', { page, itemsReturned: data.length, total, itemsPerPage });
     
     res.json({
       success: true,
       data: data,
       pagination: {
         page: page,
-        itemsPerPage: ITEMS_PER_PAGE,
+        itemsPerPage: itemsPerPage,
         totalItems: total,
-        totalPages: Math.ceil(total / ITEMS_PER_PAGE)
+        totalPages: Math.ceil(total / itemsPerPage)
       }
     });
   } catch (error) {

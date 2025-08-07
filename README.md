@@ -49,7 +49,7 @@ Stores interaction data. Requires:
 ### 🔍 `GET /fetchall`
 Returns all stored records (requires password in body).
 
-### 📄 `GET /fetchpage?pass=password&page=1`
+### 📄 `GET /fetchpage?pass=password&page=1&limit=10`
 Returns paginated records.
 
 ### ❤️ `GET /`
@@ -83,4 +83,4 @@ Events can contain any additional fields but `type` is required.
 1. Start server: `npm start`
 2. Extension calls `/start` to get configuration
 3. Extension sends data to `/save`
-4. Retrieve data via `/fetchpage?pass=yourpass&page=1`
+4. Retrieve data via `/fetchpage?pass=yourpass&page=1&limit=5`
