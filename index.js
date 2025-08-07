@@ -13,9 +13,9 @@ const ITEMS_PER_PAGE = process.env.ITEMS_PER_PAGE || 10;
 
 // Simple structured logging
 const log = {
-  info: (message, data = {}) => console.log(`[INFO] ${new Date().toISOString()} - ${message}`, data),
-  error: (message, error = {}) => console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, error),
-  warn: (message, data = {}) => console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, data)
+  info: (message, data = {}) => console.log(`[INFO] ${new Date().toISOString()} - ${message}`, JSON.stringify(data)),
+  error: (message, error = {}) => console.error(`[ERROR] ${new Date().toISOString()} - ${message}`, JSON.stringify(error)),
+  warn: (message, data = {}) => console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, JSON.stringify(data))
 };
 
 mongoose.connect(MONGODB_URL)
@@ -65,7 +65,7 @@ app.get('/start', (req, res) => {
 const importData = async (data) => {
   try {
     await Record.create(data);
-    log.info('Record imported successfully', { userId: data.userId, eventCount: data.events?.length });
+    log.info('Record imported successfully', { userId: data.userId, eventCount: data.events && data.events.length });
   } catch (error) {
     log.error('Failed to import record', error);
   }
