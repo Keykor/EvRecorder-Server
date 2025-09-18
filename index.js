@@ -18,7 +18,10 @@ const log = {
   warn: (message, data = {}) => console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, JSON.stringify(data))
 };
 
-mongoose.connect(MONGODB_URL)
+mongoose.connect(MONGODB_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => log.info('Database connected successfully'))
   .catch(err => log.error('Database connection failed', err));
 
@@ -64,10 +67,17 @@ app.get('/start', (req, res) => {
 // Helper function to save interaction data to MongoDB  
 const importData = async (data) => {
   try {
+    log.info('Attempting to import data', { userId: data.userId, dataKeys: Object.keys(data) });
     await Record.create(data);
     log.info('Record imported successfully', { userId: data.userId, eventCount: data.events && data.events.length });
   } catch (error) {
-    log.error('Failed to import record', error);
+    log.error('Failed to import record', {
+      name: error.name,
+      message: error.message,
+      code: error.code,
+      codeName: error.codeName,
+      stack: error.stack
+    });
   }
 }
 
