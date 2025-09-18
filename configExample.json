@@ -1,5 +1,5 @@
 {
-  "timeout": 10000,
+  "timeout": 60000,
   "url": true,
   "events": [
     {
@@ -10,7 +10,7 @@
     {
       "type": "scroll",
       "polling": true,
-      "interval": 1000
+      "interval": 150
     },
     {
       "type": "keydown",
@@ -24,7 +24,7 @@
     {
       "type": "mousemove",
       "polling": true,
-      "interval": 100,
+      "interval": 150,
       "attributes": ["screenX", "screenY"]
     }
   ]
