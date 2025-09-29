@@ -1,5 +1,5 @@
 {
-  "timeout": 120000,
+  "timeout": 300000,
   "url": true,
   "events": [
     {
@@ -25,7 +25,7 @@
       "type": "mousemove",
       "polling": true,
       "interval": 150,
-      "attributes": ["screenX", "screenY"]
+      "attributes": ["screenX", "screenY", "clientX", "clientY"]
     }
   ]
 }
